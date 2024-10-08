@@ -1,4 +1,10 @@
 # Audio Decomposition
+### Youtube videos
+[![Demo Video 1](https://img.youtube.com/vi/-i0PSxcoDH0/0.jpg)](https://www.youtube.com/watch?v=-i0PSxcoDH0)
+[![Demo Video 2](https://img.youtube.com/vi/F98CamFuslg/0.jpg)](https://www.youtube.com/watch?v=F98CamFuslg)
+[![Demo Video 3](https://img.youtube.com/vi/Z7D6obv12zk/0.jpg)](https://www.youtube.com/watch?v=Z7D6obv12zk)
+[![Demo Video 4](https://img.youtube.com/vi/mzPUfs9sYQE/0.jpg)](https://www.youtube.com/watch?v=mzPUfs9sYQE)
+
 ## Premise
 My plan for this project was to create a program to turn music to sheet music. It was mainly incentivised by my own desire to turn music to sheet music and the lack (from what I could tell) of open source, simple algorithms to perform audio source separation. 
 
