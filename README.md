@@ -15,17 +15,20 @@ The program’s first method of splitting music into constituent notes and instr
 
 <ins>Original fourier transform</ins>
 
-![image](https://github.com/user-attachments/assets/dcd5c5c7-79c0-4582-a160-5dccb66cb0f9)
+![image](https://github.com/user-attachments/assets/ae2d9d74-7d5f-4422-bf8b-7cc9f8e7e5fe)
+
 
 <ins>Constituent instruments</ins>
 
-![image](https://github.com/user-attachments/assets/5b1fbe01-2466-4393-8022-615c235d27cf)
+![image](https://github.com/user-attachments/assets/57d5e0ce-8245-4de3-8e0c-45e3f55ed961)
+
 
 <ins>Recreated fourier transform</ins>
 
-![image](https://github.com/user-attachments/assets/b3f5ea07-c972-44f4-8307-4a983875cb5a)
+![image](https://github.com/user-attachments/assets/795b96de-92c4-44db-b830-2efd5db5f260)
 
-The matrix to find the coefficients for each instrument is given by solving the following matrix. The matrix is derived from taking the partial derivative of the MSE cost function of by frequency(ex. FT value at 5 hz) with respect to each instrument. Each row in the matrix is a different partial derivative. (First is w.r.t cello, second is w.r.t piano, etc.)
+
+The magnitudes for each instrument are given by solving the following matrix. The matrix is derived from taking the partial derivative of the MSE cost function by frequency(ex. FT value at 5 hz) with respect to each instrument. Each row in the matrix is a different partial derivative. (First is w.r.t cello, second is w.r.t piano, etc.)
 
 <img width="519" alt="Screenshot 2024-10-05 at 8 32 50 PM" src="https://github.com/user-attachments/assets/4600c97f-ea83-4dd4-8977-2db3d9e703c1">
 
@@ -40,10 +43,13 @@ To further classify the wave, we need to take into account the main forms the wa
 
 <img width="519" alt="IMG_0331" src="https://github.com/user-attachments/assets/5953d36f-b56c-474d-bd9f-12aaefceffb5">
 
-To deal with the music file, we first take the bandpass filter of the signal for each note frequency. With the filtered wave, we iterate through each instrument. For each instrument, we take the cross correlation of the instrument’s attack(normalized) and release to find the start and end of each note, and then take the MSE of the instrument wave and the filtered audio to get our cost for the instrument at that time. After this, we multiply the magnitude we found in the fourier transform step and 1/(cost we found in this step) to get our final magnitudes. 
+To deal with the music file, we first take the bandpass filter of the signal for each note frequency. With the filtered wave, we iterate through each instrument. For each instrument, we take the cross correlation of the instrument’s attack(normalized) and release(normalized) to find the start and end of each note, and then take the MSE of the instrument wave and the filtered audio to get our cost for the instrument at that time. After this, we multiply the magnitude we found in the fourier transform step and 1/(cost we found in this step) to get our final magnitudes. 
 
 ### Display
 To display the file, we use matplotlib’s scatter plot with - shaped points to display the sheet music. Originally, I wanted to recreate the audio from the magnitudes, but it led to many issues, took a while, and made troubleshooting much harder. I also tried using matplotlib’s imshow plot, but it’s extremely inefficient in this case as most values are 0, and matplotlib needs to redraw every point regardless of if it’s on screen or not every time we pan or zoom the screen. 
+
+![image](https://github.com/user-attachments/assets/af897aca-0497-463f-82b8-f32d81394932)
+
 
 ## Results
 Overall, I think it works quite well. You can use it to make recreating sheet music better(as I did here from this video), especially if you struggle with finding the right pitch or chords, and it doesn’t take too much time to run either. 
