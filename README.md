@@ -37,6 +37,12 @@ The first step to matching the envelope of the instrument to the sound wave is t
 
 To get the envelope, the function splits the sound wave into chunks, before taking the max value at each chunk. To further refine the results, the function finds the points where the envelope is below the original sound wave and adds a new point defining the envelope. 
 
+<img width="300" alt="IMG_0333" src="https://github.com/user-attachments/assets/d3219d4a-01de-4698-8539-b095c1e330ea">
+<img width="300" alt="IMG_0334" src="https://github.com/user-attachments/assets/bbbf1bee-62b6-4ef3-8c78-b4f3bbbefbfe">
+<img width="300" alt="IMG_0335" src="https://github.com/user-attachments/assets/d6c1734a-6a58-4759-bab7-3dcf169dc997">
+<img width="300" alt="IMG_0336" src="https://github.com/user-attachments/assets/f0549389-f4c2-4672-836b-65be877cf581">
+
+
 The next step is to split the envelope of the wave into its attack, sustain, and release. The attack is the initial noise of the note, the sustain is while the note is held, and the release is when the note stops. For the instrument samples, we can take the first nonzero value of the wave to get the start of the attack. To get the point between the attack and sustain, we get the first point when the function is concave down or decreasing. To get the point between the sustain and release, we get the first point from the end where the function is increasing or concave down. To get the end of the release, we find the first point from the end where the function is nonzero. 
 
 To further classify the wave, we need to take into account the main forms the wave can take. Some instruments, such as the piano, have static decay, in which they mostly follow an exponential decay shape. On the other hand, some instruments, like the violin, can increase or decrease in volume as the note is sustained. In addition to this, some audio samples in the instrument files are held until their sound expires, while others are released early. To differentiate whether the decay is static or dynamic, if the decay factor is >1, or if it deviates from the decay curve by too much, it’s dynamic. To differentiate if the envelope has a release or not(AS or ASR), we look at the average rate of change across the sustain and the release, and if the rate of change of the release is lower then there is no release. 
