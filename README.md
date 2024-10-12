@@ -1,4 +1,6 @@
 # Audio Decomposition
+Blog post: [https://matthew-bird.com/blogs/Audio-Decomposition.html](https://matthew-bird.com/blogs/Audio-Decomposition.html)
+
 ### Youtube videos
 [![Demo Video 1](https://img.youtube.com/vi/-i0PSxcoDH0/0.jpg)](https://www.youtube.com/watch?v=-i0PSxcoDH0)
 [![Demo Video 2](https://img.youtube.com/vi/LkDJ9XT-klU/0.jpg)](https://www.youtube.com/watch?v=LkDJ9XT-klU)
