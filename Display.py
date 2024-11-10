@@ -11,7 +11,7 @@ ViewMode = 0
 MagnitudeThresh = 0.2
 CullByOverallNote = True
 
-BaseDir = "/Users/matthewbird/Documents/Python Code/Song Decomposition/"
+BaseDir = __file__
 PlayBackDir = os.listdir(BaseDir + "PlayBack/")
 InstDir = os.listdir(BaseDir + "InstrumentData/")
 

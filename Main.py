@@ -35,7 +35,7 @@ Notes = [                                                          'A0', 'Bb0', 
          'C7', 'Db7', 'D7', 'Eb7', 'E7', 'F7', 'Gb7', 'G7', 'Ab7', 'A7', 'Bb7', 'B7', 
          'C8', 'Db8', 'D8', 'Eb8', 'E8']
 
-BaseDir = "/Users/matthewbird/Documents/Python Code/Song Decomposition/"
+BaseDir = __file__
 InstDir = os.listdir(BaseDir + "InstrumentData/")
 InDir = os.listdir(BaseDir + "In/")
 
