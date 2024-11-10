@@ -45,7 +45,7 @@ for url in urls:
                 if child['href'] == "oops.html":
                     continue
                 
-                name = __file__ + "/" + child.text.split(" ")[0]
+                name = f"{os.path.dirname(os.path.realpath(__file__))}/InstrumentAudioFiles/" + child.text.split(" ")[0]
                 if name[-3:] == "zip":
                     continue
 

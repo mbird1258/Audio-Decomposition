@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 # PARAMS
 PointSpacing = 5
-BaseDir = __file__ + "/"
+BaseDir = os.path.dirname(os.path.realpath(__file__)) + "/"
 SecondDerivThreshold = 0.02
 dilation = (3,5)
 
