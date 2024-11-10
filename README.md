@@ -67,3 +67,12 @@ To display the file, we use matplotlib’s scatter plot with - shaped points to 
 
 ## Results
 Overall, I think it works quite well. You can use it to make recreating sheet music better(as I did here from this video), especially if you struggle with finding the right pitch or chords, and it doesn’t take too much time to run either. 
+
+## How to run project
+1. (Only needs to be run once after downloading from GitHub) run ScrapeInstruments.py and ProcessInstruments.py one time each (will take a while)
+   InstrumentAudioFiles and InstrumentData should now be filled
+3. Upload filetypes that soundfile.read() can process to the In folder
+4. Go into Main.py and change any parameters, primarily the whitelist or blacklist of instruments for the song
+5. Run Main.py
+   PlayBack should now have a file for each input
+7. Run Display.py to see results!
