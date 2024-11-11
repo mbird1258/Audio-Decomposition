@@ -11,7 +11,7 @@ ViewMode = 0
 MagnitudeThresh = 0.2
 CullByOverallNote = True
 
-BaseDir = __file__ + "/"
+BaseDir = os.path.dirname(os.path.realpath(__file__)) + "/"
 PlayBackDir = os.listdir(BaseDir + "PlayBack/")
 InstDir = os.listdir(BaseDir + "InstrumentData/")
 
