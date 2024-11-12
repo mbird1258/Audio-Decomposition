@@ -148,6 +148,11 @@ def GetEnvelope(data, cutoff, samplerate):
     return absinterp, chunk
 
 def GetEnvelopeCosts(data, start):
+    def norm(x):
+        if len(x) == 0:
+            return x
+        return (x-np.mean(x))/np.std(x)
+
     out = []
 
     for ind, note in enumerate(Notes):
@@ -244,7 +249,6 @@ def GetEnvelopeCosts(data, start):
                     if len(WaveSustain) > len(sustain):
                         WaveSustain = WaveSustain[:len(sustain)]
                     
-                    norm = lambda x: (x-np.mean(x))/np.std(x)
                     if type[0] == "ASR":
                         A = np.concatenate((norm(WaveAttack), norm(WaveSustain[:samplerate]), norm(WaveRelease[:int(samplerate*0.5)])), axis=None)
                         Y = np.concatenate((norm(attack[-len(WaveAttack):]), norm(sustain[:len(WaveSustain[:samplerate])]), norm(release[:len(WaveRelease[:int(samplerate*0.5)])])), axis=None)
@@ -298,6 +302,9 @@ def FTScoring(tInd, transform):
 
 for file in InDir:
     filename = os.fsdecode(file)
+    if(file == ".gitignore"):
+        # better to judge by the extension
+        continue
     name = f"{BaseDir}PlayBack/{filename.rsplit('.', 1)[0]}.pkl"
 
     data, samplerate, (f, t, Sxx) = GetSpectrogram(f"{BaseDir}In/{filename}")

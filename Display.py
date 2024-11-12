@@ -34,6 +34,8 @@ YAxis = [                                                          'A0', 'Bb0', 
 frequencies = np.power(2, np.arange(len(YAxis))/12)*27.5
 
 for file in PlayBackDir:
+    if(not file.endswith(".pkl")):
+        continue
     filename = os.fsdecode(file)
     file = open(f"{BaseDir}PlayBack/{filename}", 'rb')
     TemporalResolution, instruments, magnitudes, notes = pickle.loads(file.read())
