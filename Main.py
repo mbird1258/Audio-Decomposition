@@ -2,6 +2,7 @@ import os
 import pickle
 import soundfile as sf
 import numpy as np
+import os
 from scipy import signal
 from matplotlib import pyplot as plt
 
@@ -25,25 +26,19 @@ MaxInstruments = 10
 
 Playback = True
 
-Notes = [                                                          'A0', 'Bb0', 'B0', 
-         'C1', 'Db1', 'D1', 'Eb1', 'E1', 'F1', 'Gb1', 'G1', 'Ab1', 'A1', 'Bb1', 'B1', 
-         'C2', 'Db2', 'D2', 'Eb2', 'E2', 'F2', 'Gb2', 'G2', 'Ab2', 'A2', 'Bb2', 'B2', 
-         'C3', 'Db3', 'D3', 'Eb3', 'E3', 'F3', 'Gb3', 'G3', 'Ab3', 'A3', 'Bb3', 'B3', 
-         'C4', 'Db4', 'D4', 'Eb4', 'E4', 'F4', 'Gb4', 'G4', 'Ab4', 'A4', 'Bb4', 'B4', 
-         'C5', 'Db5', 'D5', 'Eb5', 'E5', 'F5', 'Gb5', 'G5', 'Ab5', 'A5', 'Bb5', 'B5', 
-         'C6', 'Db6', 'D6', 'Eb6', 'E6', 'F6', 'Gb6', 'G6', 'Ab6', 'A6', 'Bb6', 'B6', 
-         'C7', 'Db7', 'D7', 'Eb7', 'E7', 'F7', 'Gb7', 'G7', 'Ab7', 'A7', 'Bb7', 'B7', 
+Notes = [                                                          'A0', 'Bb0', 'B0',
+         'C1', 'Db1', 'D1', 'Eb1', 'E1', 'F1', 'Gb1', 'G1', 'Ab1', 'A1', 'Bb1', 'B1',
+         'C2', 'Db2', 'D2', 'Eb2', 'E2', 'F2', 'Gb2', 'G2', 'Ab2', 'A2', 'Bb2', 'B2',
+         'C3', 'Db3', 'D3', 'Eb3', 'E3', 'F3', 'Gb3', 'G3', 'Ab3', 'A3', 'Bb3', 'B3',
+         'C4', 'Db4', 'D4', 'Eb4', 'E4', 'F4', 'Gb4', 'G4', 'Ab4', 'A4', 'Bb4', 'B4',
+         'C5', 'Db5', 'D5', 'Eb5', 'E5', 'F5', 'Gb5', 'G5', 'Ab5', 'A5', 'Bb5', 'B5',
+         'C6', 'Db6', 'D6', 'Eb6', 'E6', 'F6', 'Gb6', 'G6', 'Ab6', 'A6', 'Bb6', 'B6',
+         'C7', 'Db7', 'D7', 'Eb7', 'E7', 'F7', 'Gb7', 'G7', 'Ab7', 'A7', 'Bb7', 'B7',
          'C8', 'Db8', 'D8', 'Eb8', 'E8']
 
-BaseDir = os.path.dirname(os.path.realpath(__file__)) + "/"
-InstDir = os.listdir(BaseDir + "InstrumentData/")
-InDir = os.listdir(BaseDir + "In/")
-
-if '.DS_Store' in InstDir:
-  InstDir.remove('.DS_Store')
-
-if '.DS_Store' in InDir:
-  InDir.remove('.DS_Store')
+BaseDir = os.path.dirname(os.path.realpath(__file__))
+InstDir = os.listdir(os.path.join(BaseDir, "InstrumentData"))
+InDir = os.listdir(os.path.join(BaseDir, "In"))
 
 
 # Functions
@@ -51,39 +46,39 @@ def ReadInstruments():
     out = [[] for _ in range(6)]
     for file in InstDir:
         filename = os.fsdecode(file)
-        
+
         if WhiteList:
             if not any(InstrumentName in filename for InstrumentName in WhiteList):
                 continue
         else:
             if any(InstrumentName in filename for InstrumentName in BlackList):
                 continue
-        
+
         if not 'ff' in filename:
             continue
 
-        name = f"{BaseDir}InstrumentData/{filename}"
-        file = open(name, 'rb')
-        x, y, keypoints, types, envelopes = pickle.loads(file.read())
-        
-        y = np.array(y)
-        y[:5] = 0
-        y[y < NoiseThreshold * np.max(y)] = 0
-        envelopes = envelopes[::SliceInterval]
+        name = os.path.join(BaseDir, "InstrumentData", filename)
+        with open(name, 'rb') as file:
+            x, y, keypoints, types, envelopes = pickle.loads(file.read())
 
-        for i, val in enumerate((filename, x, y, keypoints, types, envelopes)):
-            out[i].append(val)
-        file.close()
-    
-    for i in range(len(out)-1): 
+            y = np.array(y)
+            y[:5] = 0
+            y[y < NoiseThreshold * np.max(y)] = 0
+            envelopes = envelopes[::SliceInterval]
+
+            for i, val in enumerate((filename, x, y, keypoints, types, envelopes)):
+                out[i].append(val)
+
+    for i in range(len(out)-1):
         out[i] = np.array(out[i])
     out[-1] = np.array(out[-1], dtype=object)
     return out
+
 instruments, frequencies, coefficients, keypoints, types, envelopes = ReadInstruments()
 
 def GetSpectrogram(file):
     data, samplerate = sf.read(file)
-    
+
     # If stereo, take one channel
     if data.ndim > 1:
         data = data[:, 0]
@@ -93,7 +88,7 @@ def GetSpectrogram(file):
     # Compute the spectrogram
     NFFT = int(np.round(samplerate / PointSpacing))  # Number of points in each segment # Bigger = More resolution frequency axis,
     noverlap = NFFT // 2  # Number of overlapping points
-    
+
     return data, samplerate, signal.spectrogram(data, fs=samplerate, nperseg=NFFT, noverlap=noverlap)
 
 def hl_envelopes_idx(s, dmin=1, dmax=1, split=False):
@@ -106,24 +101,24 @@ def hl_envelopes_idx(s, dmin=1, dmax=1, split=False):
     lmin,lmax : high/low envelope idx of input signal s
     """
 
-    # locals min      
-    lmin = (np.diff(np.sign(np.diff(s))) >= 0).nonzero()[0] + 1 
+    # locals min
+    lmin = (np.diff(np.sign(np.diff(s))) >= 0).nonzero()[0] + 1
     # locals max
-    lmax = (np.diff(np.sign(np.diff(s))) <= 0).nonzero()[0] + 1 
-    
+    lmax = (np.diff(np.sign(np.diff(s))) <= 0).nonzero()[0] + 1
+
     if split:
         # s_mid is zero if s centered around x-axis or more generally mean of signal
-        s_mid = np.mean(s) 
-        # pre-sorting of locals min based on relative position with respect to s_mid 
+        s_mid = np.mean(s)
+        # pre-sorting of locals min based on relative position with respect to s_mid
         lmin = lmin[s[lmin]<s_mid]
-        # pre-sorting of local max based on relative position with respect to s_mid 
+        # pre-sorting of local max based on relative position with respect to s_mid
         lmax = lmax[s[lmax]>s_mid]
 
-    # global min of dmin-chunks of locals min 
+    # global min of dmin-chunks of locals min
     lmin = lmin[[i+np.argmin(s[lmin[i:i+dmin]]) for i in range(0,len(lmin),dmin)]]
-    # global max of dmax-chunks of locals max 
+    # global max of dmax-chunks of locals max
     lmax = lmax[[i+np.argmax(s[lmax[i:i+dmax]]) for i in range(0,len(lmax),dmax)]]
-    
+
     return lmin,lmax
 
 def GetEnvelope(data, cutoff, samplerate):
@@ -139,7 +134,7 @@ def GetEnvelope(data, cutoff, samplerate):
     for i in range(EnvelopeTuneIterations):
         print(i, end = "\r")
         absinterp = np.interp(np.arange(len(DataSliced)), labs, DataSliced[labs])
-        
+
         ind = np.argmax(DataSliced - absinterp)
         if np.abs(DataSliced[ind]) <= absinterp[ind]:
             break
@@ -158,9 +153,9 @@ def GetEnvelopeCosts(data, start):
 
         if np.all(sos <= EnvelopeNoiseThreshold[0] * np.max(data)):
             continue
-        
+
         sos, chunk = GetEnvelope(sos, cutoff, samplerate)
-        
+
         fp = signal.convolve(sos, [1]*chunk*8, mode='same')[1:] - signal.convolve(sos, [1]*chunk*8, mode='same')[:-1]
         fp[fp < 0] = 0
         bounds = np.nonzero(fp <= np.max(fp)*0.01)[0]
@@ -171,7 +166,7 @@ def GetEnvelopeCosts(data, start):
             peaks.append(np.argmax(fp[ind1:ind2+1])+ind1)
         peaks.append(np.argmax(fp[bounds[-1]:])+bounds[-1])
         peaks = np.array(peaks) + chunk*4
-        
+
         for peak in peaks:
             if sos[peak] < np.max(sos[max(0, peak-samplerate):min(len(sos), peak+samplerate)])*PeakThresh:
                 peaks = peaks[peaks != peak]
@@ -182,9 +177,9 @@ def GetEnvelopeCosts(data, start):
                 continue
 
             A, B, C, D = np.floor(keypoints/SliceInterval).astype(int)
-            
+
             print(f"\t{instrument}")
-            
+
             sustain = envelope[int(B)+1:int(C)]
 
             attack = envelope[int(A):int(B)+1]
@@ -195,7 +190,7 @@ def GetEnvelopeCosts(data, start):
 
             AttackIndexes = np.array(AttackIndexes)
             WaveA, WaveB = AttackIndexes, AttackIndexes + int(B-A)
-            
+
             match type[0]:
                 case "AS":
                     WaveC = []
@@ -210,17 +205,17 @@ def GetEnvelopeCosts(data, start):
                         corr = signal.correlate(sos[ind1:ind2+1+len(release)], (release-np.mean(release))/np.std(release), mode='valid')
                         ReleaseIndexes.append(np.argmax(corr) + ind1)
                     ReleaseIndexes = np.array(ReleaseIndexes)
-                    
+
                     WaveC, WaveD = ReleaseIndexes, ReleaseIndexes + int(D-C)
 
             for WaveInd, (a, b, c, d) in enumerate(zip(WaveA, WaveB, WaveC, WaveD)):
                 start = np.clip(b+chunk, 0, len(sos)-1)
                 end = np.clip(c-chunk, 0, len(sos)-1)
-                
+
                 if start >= end:
                     start = np.clip(b, 0, len(sos)-1)
                     end = np.clip(c, 0, len(sos)-1)
-                
+
                 if start >= end:
                     continue
 
@@ -232,18 +227,18 @@ def GetEnvelopeCosts(data, start):
                 else: # Dynamic
                     if type[1] != "Dynamic":
                         continue
-                
+
                 if type[1] == "Static":
                     WaveAttack = sos[max(a,0):b+1]
                     WaveSustain = sos[b+1:c+1]
                     if type[0] == "ASR": WaveRelease = sos[c+1:min(len(sos),d+1)]
-                    
+
                     if len(WaveSustain) == 0:
                         continue
 
                     if len(WaveSustain) > len(sustain):
                         WaveSustain = WaveSustain[:len(sustain)]
-                    
+
                     norm = lambda x: (x-np.mean(x))/np.std(x)
                     if type[0] == "ASR":
                         A = np.concatenate((norm(WaveAttack), norm(WaveSustain[:samplerate]), norm(WaveRelease[:int(samplerate*0.5)])), axis=None)
@@ -256,7 +251,7 @@ def GetEnvelopeCosts(data, start):
 
                 else:
                     WaveAttack = sos[max(a,0):b+1]
-                    if type[0] == "ASR": WaveRelease = sos[c+1:min(len(sos),d+1)] 
+                    if type[0] == "ASR": WaveRelease = sos[c+1:min(len(sos),d+1)]
 
                     if len(sos[b+1:c]) == 0:
                         continue
@@ -277,7 +272,7 @@ def FTScoring(tInd, transform):
     matrix = InstanceCoefficients @ np.concatenate((InstanceCoefficients.T, transform[:, np.newaxis]), axis = 1)
     out = magnitude = np.linalg.solve(matrix[:, :-1], matrix[:, -1:]).flatten()
     mask = np.ones(len(magnitude), np.bool_)
-    
+
     CulledInstruments = np.array([], dtype = int)
     while not np.all(out*np.average(InstanceCoefficients[mask], axis = 1) >= np.max(out*np.average(InstanceCoefficients[mask], axis = 1)) * CullThreshold):
         CulledInstruments = np.union1d(np.nonzero(magnitude <= 0)[0], np.searchsorted(np.cumsum(mask)-1, np.argmin(out*np.average(InstanceCoefficients[mask], axis = 1)))) # np.union1d(CulledInstruments, np.argmin(magnitude))
@@ -288,7 +283,7 @@ def FTScoring(tInd, transform):
         mask = np.ones(len(magnitude), np.bool_)
         mask[CulledInstruments] = 0
         magnitude[mask] = out
-    
+
     # plt.figure(figsize=(15, 2))
     # plt.plot(transform)
     # plt.plot(np.sum(InstanceCoefficients*magnitude[:, np.newaxis], axis = 0))
@@ -296,11 +291,15 @@ def FTScoring(tInd, transform):
 
     return magnitude
 
-for file in InDir:
-    filename = os.fsdecode(file)
-    name = f"{BaseDir}PlayBack/{filename.rsplit('.', 1)[0]}.pkl"
 
-    data, samplerate, (f, t, Sxx) = GetSpectrogram(f"{BaseDir}In/{filename}")
+for file in InDir:
+    if os.path.basename(file).startswith('.'):
+        continue
+
+    filename = os.fsdecode(file)
+    name = os.path.join(BaseDir, "PlayBack", f"{filename.rsplit('.', 1)[0]}.pkl")
+
+    data, samplerate, (f, t, Sxx) = GetSpectrogram(os.path.join(BaseDir, "In", filename))
     f = f[:int(np.round(22000/PointSpacing))]
     Sxx = Sxx[:int(np.round(22000/PointSpacing))]
     Sxx[:5] = 0
@@ -345,7 +344,7 @@ for file in InDir:
 
         transform[transform < max(NoiseThreshold * np.max(transform), OverallNoiseThreshold)] = 0
         magnitude = FTScoring(tInd, transform)
-        
+
         notes.append(note)
         magnitudes.append(magnitude)
     magnitudes = np.array(magnitudes)
@@ -364,7 +363,7 @@ for file in InDir:
     overlap = int(WindowSize*SliceOverlap/SliceInterval)
     for ind, slice in enumerate(np.pad(SplitData.reshape(-1)[overlap:], (0,overlap)).reshape(-1, WindowSize)):
         print(f"1 - {len(SplitData)}/{len(SplitData)} | 2 - {ind}/{len(SplitData)}")
-        
+
         out2.extend(GetEnvelopeCosts(slice, ind*WindowSize+overlap))
 
     out1 = np.array(out1)
@@ -372,12 +371,12 @@ for file in InDir:
 
     out1[:, [2,3]] *= SliceInterval
     out2[:, [2,3]] *= SliceInterval
-    
+
     # save to file
     temp = magnitudes.copy()
     for tInd, magnitude in enumerate(temp):
         time = tInd*(t[1]-t[0])
-        
+
         tOut1 = out1[np.logical_and(time >= out1[:, 2], time <= out1[:, 3])]
         tOut2 = out2[np.logical_and(time >= out2[:, 2], time <= out2[:, 3])]
 
@@ -394,9 +393,8 @@ for file in InDir:
 
             temp[tInd][InstInd] = InstMag * np.max(np.append(instOut1.flatten(), instOut2.flatten()))
 
-    file = open(name, 'wb')
-    file.write(pickle.dumps([t[1]-t[0], InstanceInstruments, temp, notes]))
-    file.close()
+    with open(name, 'wb') as file:
+        file.write(pickle.dumps([t[1]-t[0], InstanceInstruments, temp, notes]))
 
     '''
     https://4kdownload.to/envn/youtube-wav-downloader
