@@ -34,6 +34,9 @@ for file in PlayBackDir:
     if os.path.basename(file).startswith('.'):
         continue
 
+    if(not file.endswith(".pkl")):
+        continue
+
     filename = os.fsdecode(file)
     with open(os.path.join(BaseDir, "PlayBack", filename), 'rb') as file:
         TemporalResolution, instruments, magnitudes, notes = pickle.loads(file.read())
