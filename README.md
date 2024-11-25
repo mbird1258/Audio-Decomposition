@@ -70,6 +70,12 @@ Overall, I think it works quite well. You can use it to make recreating sheet mu
 
 ## How to run project
 1. (Only needs to be run once after downloading from GitHub) run ScrapeInstruments.py and ProcessInstruments.py one time each (will take a while)
+   ```
+   pip3 install -r requirements.txt
+
+   python3 ScrapeInstruments.py
+   python3 ProcessInstruments.py
+   ```
    InstrumentAudioFiles and InstrumentData should now be filled
 3. Upload filetypes that soundfile.read() can process to the In folder
 4. Go into Main.py and change any parameters, primarily the whitelist or blacklist of instruments for the song

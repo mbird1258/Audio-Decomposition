@@ -1,0 +1,6 @@
+requests
+bs4
+numpy
+scipy
+soundfile
+matplotlib
